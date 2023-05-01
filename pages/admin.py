@@ -32,3 +32,5 @@ class ProductAdmin(admin.ModelAdmin):
         ProductImageInline
     ]
     prepopulated_fields = {"slug": ("title",)}
+
+# MVT

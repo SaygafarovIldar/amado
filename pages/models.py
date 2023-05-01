@@ -1,12 +1,17 @@
 from django.db import models
+from django.urls import reverse
+
 
 # Create your models here.
 # product_slug
 # alter_product_slug
-
+# url get_absolute_url
 class Category(models.Model):
     title = models.CharField(verbose_name="Название категории", max_length=100, unique=True)
     slug = models.SlugField(unique=True, default="")
+
+    def get_absolute_url(self):
+        return reverse('main:category_products', kwargs={"slug": self.slug})
 
     def __str__(self):
         return self.title
@@ -40,6 +45,14 @@ class Product(models.Model):
     def get_first_photo(self):
         try:
             photo = self.productimage_set.all()[0].photo.url
+            return photo
+        except Exception as e:
+            return "https://images.satu.kz/126101312_w640_h640_razdel-v-razrabotketovary.jpg"
+
+
+    def get_second_photo(self):
+        try:
+            photo = self.productimage_set.all()[1].photo.url
             return photo
         except Exception as e:
             return "https://images.satu.kz/126101312_w640_h640_razdel-v-razrabotketovary.jpg"
