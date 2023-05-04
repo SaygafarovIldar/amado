@@ -42,13 +42,15 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     slug = models.SlugField(default="")
 
+    def get_absolute_url(self):
+        return reverse('main:product_detail', kwargs={"slug": self.slug})
+
     def get_first_photo(self):
         try:
             photo = self.productimage_set.all()[0].photo.url
             return photo
         except Exception as e:
             return "https://images.satu.kz/126101312_w640_h640_razdel-v-razrabotketovary.jpg"
-
 
     def get_second_photo(self):
         try:

@@ -26,3 +26,19 @@ def category_products(request, slug):
         "products": products
     }
     return render(request, "pages/shop.html", context)
+
+"""
+1. asdas
+2. eqwqw
+3. eqweq
+"""
+
+def product_detail(request, slug):
+    product = Product.objects.get(slug=slug)
+    images = product.productimage_set.all()
+    context = {
+        "product": product,
+        "images": enumerate(images),
+        "images2": images,
+    }
+    return render(request, "pages/detail.html", context)
