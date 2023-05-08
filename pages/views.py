@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, HttpResponse
 from .models import Product, Category
 # Create your views here.
@@ -11,6 +12,7 @@ def home_view(request):
     return render(request, "pages/index.html", context)
 
 
+@login_required(login_url="login")
 def shop_view(request):
     products = Product.objects.all()
     context = {
@@ -33,12 +35,12 @@ def category_products(request, slug):
 3. eqweq
 """
 
+
 def product_detail(request, slug):
     product = Product.objects.get(slug=slug)
     images = product.productimage_set.all()
     context = {
         "product": product,
-        "images": enumerate(images),
-        "images2": images,
+        "images": images,
     }
     return render(request, "pages/detail.html", context)

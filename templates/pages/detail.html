@@ -30,26 +30,21 @@
                     <div id="product_details_slider" class="carousel slide" data-ride="carousel">
                         <ol class="carousel-indicators">
 
-                            {% for idx, img in images %}
-                            <li data-target="#product_details_slider" data-slide-to="{{ idx }}"
+                            {% for img in images %}
+                            <li data-target="#product_details_slider" data-slide-to="{{ forloop.counter0 }}"
                                 style="background-image: url({{ img.photo.url }});">
                             </li>
                             {% endfor %}
                         </ol>
 
                         <div class="carousel-inner">
-                            {% for img in images2 %}
-                            <div class="carousel-item active">
-                                <a class="gallery_img" href="img/product-img/pro-big-1.jpg">
-                                    <img class="d-block w-100" src="img/product-img/pro-big-1.jpg" alt="First slide">
+                            {% for img in images %}
+                            <div class="carousel-item {% if forloop.counter == 1 %}active{% endif %}">
+                                <a class="gallery_img" href="{{ img.photo.url }}">
+                                    <img class="d-block w-100" src="{{ img.photo.url }}" alt="First slide">
                                 </a>
                             </div>
                             {% endfor %}
-                            <div class="carousel-item">
-                                <a class="gallery_img" href="img/product-img/pro-big-2.jpg">
-                                    <img class="d-block w-100" src="img/product-img/pro-big-2.jpg" alt="Second slide">
-                                </a>
-                            </div>
                         </div>
                     </div>
                 </div>
