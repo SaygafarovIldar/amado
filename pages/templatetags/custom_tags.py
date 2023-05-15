@@ -1,5 +1,4 @@
 from django import template
-
 from pages.models import Category, Brand
 
 register = template.Library()

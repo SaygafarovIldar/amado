@@ -1,22 +1,22 @@
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, HttpResponse
+from django.shortcuts import render, HttpResponse, redirect
 from .models import Product, Category
+from django.core.paginator import Paginator
 # Create your views here.
 
 
+
 def home_view(request):
-    products = Product.objects.all()
-    context = {
-        "products": products
-    }
-    return render(request, "pages/index.html", context)
+    return render(request, "pages/index.html")
 
 
-@login_required(login_url="login")
 def shop_view(request):
     products = Product.objects.all()
+    paginator = Paginator(products, 1)
+    page_number = request.GET.get('page')
+    result = paginator.get_page(page_number)
+
     context = {
-        "products": products
+        "products": result
     }
     return render(request, "pages/shop.html", context)
 
@@ -29,18 +29,11 @@ def category_products(request, slug):
     }
     return render(request, "pages/shop.html", context)
 
-"""
-1. asdas
-2. eqwqw
-3. eqweq
-"""
-
 
 def product_detail(request, slug):
     product = Product.objects.get(slug=slug)
-    images = product.productimage_set.all()
     context = {
-        "product": product,
-        "images": images,
+        "product": product
     }
-    return render(request, "pages/detail.html", context)
+    return render(request, "pages/product_detail.html", context)
+

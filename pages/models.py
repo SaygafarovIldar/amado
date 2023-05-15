@@ -1,20 +1,28 @@
 from django.db import models
+from django.template.defaultfilters import slugify
 from django.urls import reverse
 
 
 # Create your models here.
-# product_slug
-# alter_product_slug
-# url get_absolute_url
+
+# categories/1
+# categories/telefony-i-aksesuary Телефоны и аксессуары
+
+
 class Category(models.Model):
-    title = models.CharField(verbose_name="Название категории", max_length=100, unique=True)
-    slug = models.SlugField(unique=True, default="")
+    title = models.CharField(verbose_name="Название категории", max_length=150, unique=True)
+    slug = models.SlugField(blank=True, null=True, unique=True)
 
     def get_absolute_url(self):
-        return reverse('main:category_products', kwargs={"slug": self.slug})
+        return reverse("category_products", kwargs={"slug": self.slug})
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        return super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = "Категория"
@@ -22,10 +30,16 @@ class Category(models.Model):
 
 
 class Brand(models.Model):
-    title = models.CharField(verbose_name="Название бренда", max_length=100, unique=True)
+    title = models.CharField(verbose_name="Название бренда", max_length=150, unique=True)
+    slug = models.SlugField(blank=True, null=True, unique=True)
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        return super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = "Бренд"
@@ -33,34 +47,39 @@ class Brand(models.Model):
 
 
 class Product(models.Model):
-    title = models.CharField(verbose_name="Название товара", max_length=150, unique=True, default="")
-    description = models.TextField(verbose_name="Описание товара")
-    price = models.IntegerField(verbose_name="Цена товара")
-    quantity = models.IntegerField(verbose_name="Кол-во товара" , default=10)
-    is_available = models.BooleanField(default=True, verbose_name="В наличии")
-    brand = models.ForeignKey(Brand, on_delete=models.CASCADE, null=True, blank=True)
+    title = models.CharField(verbose_name="Название товара", max_length=150, unique=True)
+    descr = models.TextField(verbose_name="Описание товара")
+    price = models.IntegerField(verbose_name="Стоимость товара")
+    quantity = models.IntegerField(verbose_name="Кол-во товара")
+    is_available = models.BooleanField(verbose_name="Есть в наличии?", default=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    slug = models.SlugField(default="")
-
-    def get_absolute_url(self):
-        return reverse('main:product_detail', kwargs={"slug": self.slug})
-
-    def get_first_photo(self):
-        try:
-            photo = self.productimage_set.all()[0].photo.url
-            return photo
-        except Exception as e:
-            return "https://images.satu.kz/126101312_w640_h640_razdel-v-razrabotketovary.jpg"
-
-    def get_second_photo(self):
-        try:
-            photo = self.productimage_set.all()[1].photo.url
-            return photo
-        except Exception as e:
-            return "https://images.satu.kz/126101312_w640_h640_razdel-v-razrabotketovary.jpg"
+    brand = models.ForeignKey(Brand, on_delete=models.CASCADE, null=True, blank=True)
+    slug = models.SlugField()
 
     def __str__(self):
         return self.title
+
+    def get_absolute_url(self):
+        return reverse("product_detail", kwargs={"slug": self.slug})
+
+    def get_first_photo(self):
+        photo = self.productimage_set.all().first()
+        if photo is not None:
+            return photo.photo.url
+        return "https://images.satu.kz/126101312_w640_h640_razdel-v-razrabotketovary.jpg"
+
+    def get_second_photo(self):
+        try:
+            photo = self.productimage_set.all()[1]
+            if photo is not None:
+                return photo.photo.url
+        except Exception as e:
+            return "https://images.satu.kz/126101312_w640_h640_razdel-v-razrabotketovary.jpg"
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        return super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = "Продукт"
@@ -68,5 +87,6 @@ class Product(models.Model):
 
 
 class ProductImage(models.Model):
-    photo = models.ImageField(verbose_name="Фото", upload_to="products/", null=True, blank=True)
+    photo = models.ImageField(verbose_name="Фото", upload_to="products/", blank=True, null=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
+

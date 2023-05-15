@@ -1,0 +1,14 @@
+{% if products.has_other_pages %}
+<nav aria-label="navigation">
+    <ul class="pagination justify-content-end mt-50">
+        {% for i in products.paginator.page_range %}
+        {% if products.number == i %}
+        <li class="page-item active"><a class="page-link" href="?page={{ i }}">{{ i }}.</a></li>
+        {% else %}
+        <li class="page-item"><a class="page-link" href="?page={{ i }}">{{ i }}.</a></li>
+        {% endif %}
+
+        {% endfor %}
+    </ul>
+</nav>
+{% endif %}
